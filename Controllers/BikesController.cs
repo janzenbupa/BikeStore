@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BikeStore.DataAccessLayer.Logic.BikeLogic;
+using BikeStore.Models;
+using BikeStore.Models.GetModels;
 using BikeStore.Models.Orders;
-using BikeStore.Models.Orders.GetModels;
-using BikeStore.Models.Orders.PostModels;
+using BikeStore.Models.PostModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

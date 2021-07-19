@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BikeStore.Models.Orders
+namespace BikeStore.Models
 {
     /// <summary>
     /// Base request of the Bikes controller.

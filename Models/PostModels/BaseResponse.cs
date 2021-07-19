@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BikeStore.Models.Orders.PostModels
+namespace BikeStore.Models.PostModels
 {
     /// <summary>
     /// Base response of POST requests.

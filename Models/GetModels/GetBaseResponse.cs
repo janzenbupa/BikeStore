@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BikeStore.Models.Orders.GetModels
+namespace BikeStore.Models.GetModels
 {
     /// <summary>
     /// A base response that will be returned by every GET action.

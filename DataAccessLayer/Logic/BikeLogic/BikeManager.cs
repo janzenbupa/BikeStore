@@ -1,11 +1,9 @@
 ﻿using BikeStore.Configuration;
 using BikeStore.DataAccessLayer.Logic.DataLogic;
 using BikeStore.DataAccessLayer.Models;
-using BikeStore.Models.Orders;
+using BikeStore.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BikeStore.DataAccessLayer.Logic.BikeLogic
 {
