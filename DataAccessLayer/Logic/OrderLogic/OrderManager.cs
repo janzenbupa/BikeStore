@@ -78,8 +78,8 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
 
                 else
                 {
-                    customer.NumberOfOrders++;
-                    customerId = CustomerData.SaveCustomer(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), customer);
+                customer.NumberOfOrders++;
+                customerId = CustomerData.SaveCustomer(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), customer);
 
                     if (customerId <= 0)
                     {
@@ -104,8 +104,8 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
                 }
 
                 returnObj = "Order has been successfully placed.";
-                scope.Complete();
-            }
+            scope.Complete();
+        }
 
             return returnObj;
         }

@@ -67,7 +67,7 @@ namespace BikeStore.DataAccessLayer.Logic.DataLogic
                     {
                         sqlCmd.CommandType = System.Data.CommandType.StoredProcedure;
 
-                        sqlCmd.Parameters.Add(new SqlParameter("@Id", order.Id)).Direction = System.Data.ParameterDirection.Output;
+                        sqlCmd.Parameters.Add(new SqlParameter("@Id", order.Id)).Direction = System.Data.ParameterDirection.InputOutput;
                         sqlCmd.Parameters.Add(new SqlParameter("@bikeId", order.BikeId));
                         sqlCmd.Parameters.Add(new SqlParameter("@quantityOfBikes", order.QuantityOfBikes));
                         sqlCmd.Parameters.Add(new SqlParameter("@customerId", order.CustomerId));
