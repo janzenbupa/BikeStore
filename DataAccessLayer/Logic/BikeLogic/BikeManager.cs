@@ -4,6 +4,7 @@ using BikeStore.DataAccessLayer.Models;
 using BikeStore.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BikeStore.DataAccessLayer.Logic.BikeLogic
 {
@@ -45,6 +46,15 @@ namespace BikeStore.DataAccessLayer.Logic.BikeLogic
                 if (bikeRequest.Quantity <= 0)
                 {
                     returnObj = "Quantity must be greater than 0.";
+                    return returnObj;
+                }
+
+                Bike currentBike = BikeData.RetrieveBikes(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"))
+                    .FirstOrDefault(x => x.Model == bikeRequest.Model);
+
+                if (currentBike != null)
+                {
+                    returnObj = "Bike already exists in inventory.";
                     return returnObj;
                 }
 

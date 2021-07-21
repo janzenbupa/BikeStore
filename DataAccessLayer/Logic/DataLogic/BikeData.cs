@@ -84,10 +84,11 @@ namespace BikeStore.DataAccessLayer.Logic.DataLogic
         /// <returns></returns>
         private static List<Bike> ReadBikes(SqlDataReader reader)
         {
-            Bike bike = new Bike();
+            Bike bike;
             List<Bike> returnObj = new List<Bike>();
             while (reader.Read())
             {
+                bike = new Bike();
                 bike.Id = Int64.Parse(reader["Id"].ToString());
                 bike.Model = reader["Model"].ToString();
                 bike.Price = Decimal.Parse(reader["Price"].ToString());

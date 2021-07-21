@@ -31,7 +31,7 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
             }
             if (orderRequest.Quantity == 0)
             {
-                returnObj = "Quantity must be greater than 0.";
+                returnObj = "Quantity must be greater than 0. Quantity must match number of bikes ordered.";
                 return returnObj;
             }
 
@@ -40,7 +40,7 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
             decimal price = 0;
             for (int i = 0; i < models.Count; i++)
             {
-                Bike bike = bikes.Where(x => x.Model == models[i]).FirstOrDefault();
+                Bike bike = bikes.Where(x => x.Model.Replace(" ", "").ToLower() == models[i].Replace(" ", "").ToLower()).FirstOrDefault();
                 if (bike == null)
                 {
                     returnObj = "Some of these bikes are not in stock. Either add the Bike to the inventory or update the order request to contain valid bikes only.";
@@ -50,48 +50,63 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
                 price += bike.Price;
             }
 
+            long customerId;
             Customer customer = CustomerData.RetrieveCustomers(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"))
-                .FirstOrDefault(x => x.FirstName == orderRequest.FirstName && x.LastName == orderRequest.LastName);
+                .FirstOrDefault(x => x.FirstName.ToLower() == orderRequest.FirstName.ToLower() && x.LastName.ToLower() == orderRequest.LastName.ToLower());
 
-            if (customer == null)
+            using (System.Transactions.TransactionScope scope = new System.Transactions.TransactionScope())
             {
-                Customer newCustomer = new Customer
+                if (customer == null)
                 {
-                    FirstName = orderRequest.FirstName,
-                    LastName = orderRequest.LastName,
-                    NumberOfOrders = 1
-                };
-                
-                long customerId = CustomerData.SaveCustomer(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), newCustomer);
-                
-                if (customerId <= 0)
-                {
-                    returnObj = "Could not find or add customer. Order failed to save.";
-                    return returnObj;
+                    Customer newCustomer = new Customer
+                    {
+                        FirstName = orderRequest.FirstName,
+                        LastName = orderRequest.LastName,
+                        NumberOfOrders = 1
+                    };
+
+                    customerId = CustomerData.SaveCustomer(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), newCustomer);
+
+                    if (customerId <= 0)
+                    {
+                        returnObj = "Could not find or add customer. Order failed to save.";
+                        return returnObj;
+                    }
+
+                    customer.Id = customerId;
                 }
-                customer = new Customer
+
+                else
                 {
-                    Id = customerId
+                    customer.NumberOfOrders++;
+                    customerId = CustomerData.SaveCustomer(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), customer);
+
+                    if (customerId <= 0)
+                    {
+                        returnObj = "Could not find or add customer. Order failed to save.";
+                        return returnObj;
+                    }
+                }
+
+                Order order = new Order
+                {
+                    BikeId = orderRequest.Model,
+                    QuantityOfBikes = models.Count,
+                    CustomerId = customer.Id,
+                    Price = price
                 };
+
+                long id = OrderData.SaveOrder(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), order);
+                
+                if (id <= 1)
+                {
+                    returnObj = "Order failed to save.";
+                }
+
+                returnObj = "Order has been successfully placed.";
+                scope.Complete();
             }
 
-            Order order = new Order
-            {
-                BikeId = orderRequest.Model,
-                QuantityOfBikes = models.Count,
-                CustomerId = customer.Id,
-                Price = price
-            };
-
-            long id = OrderData.SaveOrder(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), order);
-
-            if (id <= 1)
-            {
-                returnObj = "Order failed to save.";
-                return returnObj;
-            }
-
-            returnObj = "Order has been successfully placed.";
             return returnObj;
         }
 

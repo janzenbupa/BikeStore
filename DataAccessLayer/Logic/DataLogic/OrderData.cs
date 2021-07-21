@@ -1,4 +1,5 @@
-﻿using BikeStore.DataAccessLayer.Models;
+﻿using BikeStore.Configuration;
+using BikeStore.DataAccessLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -12,6 +13,7 @@ namespace BikeStore.DataAccessLayer.Logic.DataLogic
     /// </summary>
     public static class OrderData
     {
+        private static string persistentConnection;
         /// <summary>
         /// Retrieve a list of Orders from the db.
         /// </summary>
@@ -20,6 +22,7 @@ namespace BikeStore.DataAccessLayer.Logic.DataLogic
         public static List<Order> RetrieveOrders(string connectionString)
         {
             List<Order> obj = new List<Order>();
+            persistentConnection = connectionString;
 
             try
             {
@@ -32,6 +35,10 @@ namespace BikeStore.DataAccessLayer.Logic.DataLogic
                         SqlDataReader reader = sqlCmd.ExecuteReader();
                         obj = ReadOrders(reader);
                     }
+                }
+                foreach (var item in obj)
+                {
+                    obj = GetPriceOfOrder(obj);
                 }
 
                 return obj;
@@ -69,7 +76,7 @@ namespace BikeStore.DataAccessLayer.Logic.DataLogic
                         sqlCmd.Connection.Open();
                         sqlCmd.ExecuteNonQuery();
 
-                        obj = Int64.Parse(sqlCmd.Parameters["@Id"].Value.ToString()) as  Int64? ?? 0;
+                        obj = Int64.Parse(sqlCmd.Parameters["@Id"].Value.ToString()) as Int64? ?? 0;
                     }
                 }
             }
@@ -97,6 +104,46 @@ namespace BikeStore.DataAccessLayer.Logic.DataLogic
                 order.CustomerId = Int64.Parse(reader["CustomerId"].ToString());
 
                 returnObj.Add(order);
+            }
+
+            return returnObj;
+        }
+
+        /// <summary>
+        /// RetrieveOrders will call this method to calculate the price of each order.
+        /// </summary>
+        /// <param name="orders"/>></param>
+        /// <returns></returns>
+        private static List<Order> GetPriceOfOrder(List<Order> orders)
+        {
+            try
+            {
+                foreach (var item in orders)
+                {
+                    item.Price = GetPriceOfOrder(item.BikeId);
+                }
+                return orders;
+            }
+            catch (Exception)
+            {
+                return orders;
+            }
+        }
+
+        /// <summary>
+        /// Price of each order will be calculated based on each bike type purchased and its price.
+        /// </summary>
+        /// <param name="stringOfBikes"></param>
+        /// <returns></returns>
+        private static Decimal GetPriceOfOrder(String stringOfBikes)
+        {
+            decimal returnObj = 0;
+            List<string> bikes = stringOfBikes.ToLower().Split("-").ToList();
+            Dictionary<string, decimal> bikePrices = BikeData.RetrieveBikes(persistentConnection).ToDictionary(x => x.Model.ToLower(), x => x.Price);
+
+            foreach (var item in bikes)
+            {
+                returnObj += bikePrices[item];
             }
 
             return returnObj;
