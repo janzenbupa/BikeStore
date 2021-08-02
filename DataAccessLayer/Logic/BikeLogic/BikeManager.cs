@@ -66,7 +66,8 @@ namespace BikeStore.DataAccessLayer.Logic.BikeLogic
                 {
                     Model = bikeRequest.Model,
                     Price = bikeRequest.Price,
-                    Quantity = bikeRequest.Quantity
+                    Quantity = bikeRequest.Quantity,
+                    Available = bikeRequest.Available ?? bikeRequest.Quantity
                 };
 
                 long id = BikeData.SaveBike(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), bike);
