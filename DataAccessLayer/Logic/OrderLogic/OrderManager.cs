@@ -16,35 +16,31 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
 
             if (String.IsNullOrEmpty(orderRequest.FirstName))
             {
-                returnObj = "First name cannot be empty.";
-                return returnObj;
+                return "First name cannot be empty.";
             }
             if (String.IsNullOrEmpty(orderRequest.LastName))
             {
-                returnObj = "Last name cannot be empty.";
-                return returnObj;
+                return "Last name cannot be empty.";
             }
             if (String.IsNullOrEmpty(orderRequest.Model))
             {
-                returnObj = "Must specify which model.";
-                return returnObj;
+                return "Must specify which model.";
             }
             if (orderRequest.Quantity == 0)
             {
-                returnObj = "Quantity must be greater than 0. Quantity must match number of bikes ordered.";
-                return returnObj;
+                return "Quantity must be greater than 0. Quantity must match number of bikes ordered.";
             }
 
             List<string> models = orderRequest.Model.Split("-").ToList();
             List<Bike> bikes = BikeData.RetrieveBikes(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"));
             decimal price = 0;
+
             for (int i = 0; i < models.Count; i++)
             {
                 Bike bike = bikes.Where(x => x.Model.Replace(" ", "").ToLower() == models[i].Replace(" ", "").ToLower()).FirstOrDefault();
                 if (bike == null)
                 {
-                    returnObj = "Some of these bikes are not in stock. Either add the Bike to the inventory or update the order request to contain valid bikes only.";
-                    return returnObj;
+                    return "Some of these bikes are not in stock. Either add the Bike to the inventory or update the order request to contain valid bikes only.";
                 }
 
                 price += bike.Price;
@@ -69,8 +65,7 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
 
                     if (customerId <= 0)
                     {
-                        returnObj = "Could not find or add customer. Order failed to save.";
-                        return returnObj;
+                        return "Could not find or add customer. Order failed to save.";
                     }
 
                     customer.Id = customerId;
@@ -78,13 +73,12 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
 
                 else
                 {
-                customer.NumberOfOrders++;
-                customerId = CustomerData.SaveCustomer(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), customer);
+                    customer.NumberOfOrders++;
+                    customerId = CustomerData.SaveCustomer(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), customer);
 
                     if (customerId <= 0)
                     {
-                        returnObj = "Could not find or add customer. Order failed to save.";
-                        return returnObj;
+                        return "Could not find or add customer. Order failed to save.";
                     }
                 }
 
@@ -97,15 +91,29 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
                 };
 
                 long id = OrderData.SaveOrder(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), order);
-                
-                if (id <= 1)
+
+                if (id <= 0)
                 {
-                    returnObj = "Order failed to save.";
+                    return "Order failed to save.";
+                }
+
+                foreach (var item in models)
+                {
+                    Bike bike = bikes.Where(x => x.Model.ToLower() == item.ToLower()).First();
+                    int available = models.Where(x => x == item).Count();
+                    bike.Available--;
+
+                    long bikeId = BikeData.SaveBike(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), bike);
+
+                    if (bikeId <= 0)
+                    {
+                        return "Could not find bikes.";
+                    }
                 }
 
                 returnObj = "Order has been successfully placed.";
-            scope.Complete();
-        }
+                scope.Complete();
+            }
 
             return returnObj;
         }

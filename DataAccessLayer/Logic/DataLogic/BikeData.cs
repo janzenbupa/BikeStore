@@ -62,6 +62,7 @@ namespace BikeStore.DataAccessLayer.Logic.DataLogic
                         sqlCmd.Parameters.Add(new SqlParameter("@model", bike.Model));
                         sqlCmd.Parameters.Add(new SqlParameter("@price", bike.Price));
                         sqlCmd.Parameters.Add(new SqlParameter("@quantity", bike.Quantity));
+                        sqlCmd.Parameters.Add(new SqlParameter("@available", bike.Available));
 
                         sqlCmd.Connection.Open();
                         sqlCmd.ExecuteNonQuery();
@@ -93,6 +94,7 @@ namespace BikeStore.DataAccessLayer.Logic.DataLogic
                 bike.Model = reader["Model"].ToString();
                 bike.Price = Decimal.Parse(reader["Price"].ToString());
                 bike.Quantity = Int32.Parse(reader["Quantity"].ToString());
+                bike.Available = Int32.Parse(reader["Available"].ToString());
 
                 returnObj.Add(bike);
             }

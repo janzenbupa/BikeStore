@@ -48,6 +48,10 @@ namespace BikeStore.DataAccessLayer.Logic.BikeLogic
                     returnObj = "Quantity must be greater than 0.";
                     return returnObj;
                 }
+                if (bikeRequest.Available == 0 || bikeRequest.Available == null)
+                {
+                    bikeRequest.Available = bikeRequest.Quantity;
+                }
 
                 Bike currentBike = BikeData.RetrieveBikes(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"))
                     .FirstOrDefault(x => x.Model == bikeRequest.Model);
