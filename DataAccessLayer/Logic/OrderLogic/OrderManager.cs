@@ -54,14 +54,14 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
             {
                 if (customer == null)
                 {
-                    Customer newCustomer = new Customer
+                    customer = new Customer
                     {
                         FirstName = orderRequest.FirstName,
                         LastName = orderRequest.LastName,
                         NumberOfOrders = 1
                     };
 
-                    customerId = CustomerData.SaveCustomer(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), newCustomer);
+                    customerId = CustomerData.SaveCustomer(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), customer);
 
                     if (customerId <= 0)
                     {
@@ -100,7 +100,7 @@ namespace BikeStore.DataAccessLayer.Logic.OrderLogic
                 foreach (var item in models)
                 {
                     Bike bike = bikes.Where(x => x.Model.ToLower() == item.ToLower()).First();
-                    int available = models.Where(x => x == item).Count();
+                    int available = models.Where(x => x.ToLower() == item.ToLower()).Count();
                     bike.Available--;
 
                     long bikeId = BikeData.SaveBike(new ConfigurationRetriever().RetrieveConfig("ConnectionStrings", "BikeStore"), bike);

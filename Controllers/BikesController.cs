@@ -2,9 +2,7 @@
 using BikeStore.DataAccessLayer.Logic.BikeLogic;
 using BikeStore.Models;
 using BikeStore.Models.GetModels;
-using BikeStore.Models.Orders;
 using BikeStore.Models.PostModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BikeStore.Controllers
