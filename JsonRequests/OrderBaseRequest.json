@@ -1,1 +1,6 @@
-
+{
+	"FirstName": "string",
+	"LastName": "string",
+	"Model": "string",
+	"Quantity": int
+}
