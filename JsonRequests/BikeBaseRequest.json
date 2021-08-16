@@ -1,0 +1,6 @@
+{
+	"Model": "string object",
+	"Price": Decimal,
+	"Quantity": int,
+	"Available": int
+}
